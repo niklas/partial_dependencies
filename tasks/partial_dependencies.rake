@@ -1,8 +1,24 @@
 require 'stringio'
 
+#
+# Rake task will scan all the views and partials to generate a linkage graph.
+# Options to select output file type and "used", "unused", or "all" partials
+# listed.
+#
+# rake partial_dependencies:generate_picture
+#
+# Defaults to an output file type of .png (other available types are unknown).
+# Defaults to graphing only used partials don't know what other types are available
+# 
+# rake partial_dependencies:generate_picture[<file_type>,<view_set>]
+#
+# Note that no spaces are allowed. <file_type> works at least for png. Allowed
+# values for <view_set> are used, unused, and all.
+#
+
 class PartialDependencies
   
-  def initialize(base_path = File.expand_path(File.join(RAILS_ROOT,"app", "views")))
+  def initialize(base_path = File.expand_path(File.join(Rails.root,"app", "views")))
     @base_path = base_path
   end
 
@@ -54,8 +70,11 @@ class PartialDependencies
       @all_views << pwfe(view)
       File.open("#{view[:path]}") do |contents|
         contents.each do |line|
-          if line =~ /=\s*render\s*\(?:partial\s*=>\s*["'](.*?)["']/
-            partial_name = $1
+          # Modified
+          # Fixed the line below to allow spaces between the opening ( and "partial" text.
+          # Also modified to allow Rails 3 symbol syntax.
+          if line =~ /=\s*render\s*\(?\s*((?::partial\s*=>)|(?:partial:))\s*["'](.*?)["']/
+            partial_name = $2
             if partial_name.index("/")
               partial_name = partial_name.gsub(/\/([^\/]*)$/, "/_\\1")
             else
