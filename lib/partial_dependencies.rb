@@ -1,5 +1,5 @@
 require "partial_dependencies/version"
 
 module PartialDependencies
-  # Your code goes here...
+  require "lib/partial_dependencies/railtie" if defined?(Rails)
 end
