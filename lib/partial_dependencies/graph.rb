@@ -54,25 +54,35 @@ module PartialDependencies
         @all_views << pwfe(view)
         File.open("#{view[:path]}") do |contents|
           contents.each do |line|
-            # Modified
-            # Fixed the line below to allow spaces between the opening ( and "partial" text.
-            # Also modified to allow Rails 3 symbol syntax.
-            if line =~ /=\s*render\s*\(?\s*((?::partial\s*=>)|(?:partial:))\s*["'](.*?)["']/
-              partial_name = $2
-              if partial_name.index("/")
-                partial_name = partial_name.gsub(/\/([^\/]*)$/, "/_\\1")
-              else
-                partial_name = "#{File.dirname(view[:name])}/_#{partial_name}"
-              end
-              @edges[pwfe(view)] << partial_name
-              @used_views[pwfe(view)] = true
-              @used_views[partial_name] = true
+            if partial_name = scan_line(line)
+              found_render partial_name, view
+
             end
           end
         end
       end
       @used_views = @used_views.keys
       @unused_views = @all_views - @used_views
+    end
+
+    def scan_line(line)
+      # Modified
+      # Fixed the line below to allow spaces between the opening ( and "partial" text.
+      # Also modified to allow Rails 3 symbol syntax.
+      if line =~ /=\s*render\s*\(?\s*((?::partial\s*=>)|(?:partial:))\s*["'](.*?)["']/
+        return $2
+      end
+    end
+
+    def found_render(partial_name, view)
+      if partial_name.index("/")
+        partial_name = partial_name.gsub(/\/([^\/]*)$/, "/_\\1")
+      else
+        partial_name = "#{File.dirname(view[:name])}/_#{partial_name}"
+      end
+      @edges[pwfe(view)] << partial_name
+      @used_views[pwfe(view)] = true
+      @used_views[partial_name] = true
     end
     
     def pwfe(view)
