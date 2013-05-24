@@ -14,4 +14,5 @@ Gem::Specification.new do |gem|
   gem.name          = "partial_dependencies"
   gem.require_paths = ["lib"]
   gem.version       = PartialDependencies::VERSION
+  gem.add_development_dependency "rspec", "~> 2.8.0"
 end
