@@ -71,6 +71,8 @@ module PartialDependencies
       # Also modified to allow Rails 3 symbol syntax.
       if line =~ /=\s*render\s*\(?\s*((?::partial\s*=>)|(?:partial:))\s*["'](.*?)["']/
         return $2
+      elsif line =~ /=\s*render\s*\s*["'](.*?)["']/
+        return $1
       end
     end
 

@@ -20,6 +20,11 @@ describe PartialDependencies::Graph do
       scan(line).should == 'foo/bar'
     end
 
+    it 'detects lazy render (without partial option)' do
+      line = %Q~= render 'foo/bar', bar: bar~
+      scan(line).should == 'foo/bar'
+    end
+
     it "ignores non-render lines" do
       scan("<p>no render here</p>").should be_nil
     end
